@@ -22,9 +22,11 @@ def createUser(username):
     for i in users:
         print(i)
     db.commit()
+    db.close()
 
 if __name__ == "__main__":
     main()
+
 # while True:
 #     event, values = login.read() 
 #     print(event, values)       
