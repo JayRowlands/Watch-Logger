@@ -7,7 +7,7 @@ def main():
 
     layout = [[sg.Text('Enter Username')],
             [sg.Listbox(key='User_List', values=user_list, size=(40, 10), enable_events=True,)],   
-            [sg.Input(key='Username', do_not_clear=False)],      
+            [sg.Input(key='Username')],      
             [sg.Button('Login'), sg.Button('Create User'), sg.Button('Delete User'), sg.Exit()]]      
 
     login = sg.Window('Watch Logger', layout).Finalize()  
@@ -21,11 +21,14 @@ def main():
         if event == 'Create User':
             createUser(values.get('Username'))
             login.find_element('User_List').Update(values=getUsers())
+            login.find_element('Username').Update("")
             event, values = login.Read()
+            
         if event == 'Delete User':
             if (values.get('Username') != ""):
                 deleteUser(values.get('Username'))
                 login.find_element('User_List').Update(values=getUsers())
+                login.find_element('Username').Update("")
                 event, values = login.Read()
     login.Close()
     #createUser(values.get('Username'))
@@ -44,11 +47,11 @@ def createUser(username):
     username= username.strip(" ' ")
 
     for i in getUsers():
-        if i == username:
-            db.close
-            return "User already exists"
+        if i == username or i == "":
+            return "Please try again"
         else: 
             cursor.execute(f"INSERT INTO Users (name) VALUES ('{username}')")
+            break
     db.commit()
     db.close()
 
@@ -60,7 +63,7 @@ def deleteUser(username):
     for c in list_of_chars:
         username = username.replace(c, '')
     username= username.strip(" ' ")
-    
+
     cursor.execute(f"DELETE FROM Users WHERE name = '{username}'")
     db.commit()
     db.close()
