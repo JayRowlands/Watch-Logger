@@ -7,10 +7,10 @@ def main():
 
     layout = [[sg.Text('Enter Username')],
             [sg.Listbox(key='User_List', values=user_list, size=(40, 10), enable_events=True,)],   
-            [sg.Input(key='Username', do_not_clear=False, enable_events=True)],      
+            [sg.Input(key='Username', do_not_clear=False)],      
             [sg.Button('Login'), sg.Button('Create User'), sg.Button('Delete User'), sg.Exit()]]      
 
-    login = sg.Window('Watch Logger', layout).Finalize()      
+    login = sg.Window('Watch Logger', layout).Finalize()  
  
     while True:
         event, values = login.Read()
@@ -20,6 +20,8 @@ def main():
             login.find_element('Username').Update(values.get("User_List"))
         if event == 'Create User':
             createUser(values.get('Username'))
+            login.find_element('User_List').Update(values=getUsers())
+            event, values = login.Read()
         if event == 'Delete User':
             if (values.get('Username') != ""):
                 deleteUser(values.get('Username'))
@@ -35,17 +37,30 @@ def login(username):
 def createUser(username):
     db = sqlite3.connect('logger.sqlite3')
     cursor = db.cursor()
-    cursor.execute(f"INSERT INTO Users (name) VALUES ('{username}')")
+
+    list_of_chars = ['(', ',', ')']
+    for c in list_of_chars:
+        username = username.replace(c, '')
+    username= username.strip(" ' ")
+
+    for i in getUsers():
+        if i == username:
+            db.close
+            return "User already exists"
+        else: 
+            cursor.execute(f"INSERT INTO Users (name) VALUES ('{username}')")
     db.commit()
     db.close()
 
 def deleteUser(username):
     db = sqlite3.connect('logger.sqlite3')
     cursor = db.cursor()
+
     list_of_chars = ['(', ',', ')']
     for c in list_of_chars:
         username = username.replace(c, '')
     username= username.strip(" ' ")
+    
     cursor.execute(f"DELETE FROM Users WHERE name = '{username}'")
     db.commit()
     db.close()
@@ -63,11 +78,3 @@ def getUsers():
 
 if __name__ == "__main__":
     main()
-
-# while True:
-#     event, values = login.read() 
-#     print(event, values)       
-#     if event == sg.WIN_CLOSED or event == 'Exit':
-#         break      
-
-# login.close()
