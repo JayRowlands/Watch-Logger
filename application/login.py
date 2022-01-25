@@ -1,6 +1,8 @@
 import PySimpleGUI as sg      
 import sqlite3
 
+from sqlalchemy import null
+
 def main():
     user_list = getUsers()
     sg.theme('DarkGrey6')
@@ -46,13 +48,21 @@ def createUser(username):
         username = username.replace(c, '')
     username= username.strip(" ' ")
 
-    for i in getUsers():
-        if i == username or i == "":
-            return "Please try again"
-        else: 
+    exists = False
+    
+    if not getUsers():
+        cursor.execute(f"INSERT INTO Users (name) VALUES ('{username}')")
+        db.commit()
+    else:
+        for i in range(len(getUsers())):
+            if getUsers()[i] == username:
+                print(getUsers()[i])
+                print(username)
+                exists = True
+        if (exists == False): 
             cursor.execute(f"INSERT INTO Users (name) VALUES ('{username}')")
-            break
-    db.commit()
+            db.commit()
+    
     db.close()
 
 def deleteUser(username):
@@ -73,7 +83,7 @@ def getUsers():
     cursor = db.cursor()
     cursor.execute("SELECT name FROM Users")
     users = [item[0] for item in cursor.fetchall()]
-    user_list = []
+    user_list = list()
     for i in users:
         user_list.append(i)
     db.close()
