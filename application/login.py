@@ -1,6 +1,6 @@
 import PySimpleGUI as sg      
 import sqlite3
-
+import app
 from sqlalchemy import null
 
 def main():
@@ -18,6 +18,8 @@ def main():
         event, values = login.Read()
         if event is None or event == 'Exit':                # always check for closed window
             break
+        if event == 'Login':
+            log(values.get('Username'))
         if event == 'User_List' and len(values['User_List']):     # if a list item is chosen
             login.find_element('Username').Update(values.get("User_List"))
         if event == 'Create User':
@@ -31,11 +33,13 @@ def main():
                 login.find_element('User_List').Update(values=getUsers())
                 login.find_element('Username').Update("")
     login.Close()
-    #createUser(values.get('Username'))
 
-
-def login(username):
-    print("to do")
+def log(username):
+    list_of_chars = ['(', ',', ')']
+    for c in list_of_chars:
+        username = username.replace(c, '')
+    username= username.strip(" ' ")
+    app.app(username)
 
 def createUser(username):
     db = sqlite3.connect('logger.sqlite3')
