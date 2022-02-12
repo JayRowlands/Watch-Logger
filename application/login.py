@@ -24,14 +24,12 @@ def main():
             createUser(values.get('Username'))
             login.find_element('User_List').Update(values=getUsers())
             login.find_element('Username').Update("")
-            event, values = login.Read()
             
         if event == 'Delete User':
             if (values.get('Username') != ""):
                 deleteUser(values.get('Username'))
                 login.find_element('User_List').Update(values=getUsers())
                 login.find_element('Username').Update("")
-                event, values = login.Read()
     login.Close()
     #createUser(values.get('Username'))
 
@@ -56,8 +54,6 @@ def createUser(username):
     else:
         for i in range(len(getUsers())):
             if getUsers()[i] == username:
-                print(getUsers()[i])
-                print(username)
                 exists = True
         if (exists == False): 
             cursor.execute(f"INSERT INTO Users (name) VALUES ('{username}')")
