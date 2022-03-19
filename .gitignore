@@ -1,3 +1,2 @@
-application/pycache/app.cpython-310
-application/pycache/db.cpython-310
+application/__pycache__
 logger.sqlite3
